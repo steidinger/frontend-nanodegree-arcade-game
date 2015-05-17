@@ -23,13 +23,14 @@ var Engine = (function(global) {
         win = global.window,
         canvas = doc.createElement('canvas'),
         messageBox = doc.createElement('p'),
+        levelBox = doc.createElement('div'),
         ctx = canvas.getContext('2d'),
-        gameState = 'waiting',
+        gameState,
+        currentLevel = 0,
         messages = {
-            waiting: 'Press any key to start a new game',
-            playing: 'Try to reach the top without being hit by a bug. You can move your character using the arrow keys',
-            levelWon: 'Congratulations, you\'ve reached the top! Press any key to continue',
-            levelLost: 'Too bad, you were hit by a bug. Press any key to continue'
+            playing: 'Try to reach the top without being hit by a bug. You can move your character using the arrow keys.',
+            levelLost: 'Too bad, you were hit by a bug. Press any key to try again.',
+            gameWon: 'Congratulations, you\'ve reached the top of the last level! Press any key to start a new game.'
         },
         lastTime;
 
@@ -37,6 +38,8 @@ var Engine = (function(global) {
     canvas.height = 606;
     doc.body.appendChild(canvas);
     messageBox.setAttribute("class", "message");
+    levelBox.setAttribute('class', 'level');
+    doc.body.appendChild(levelBox);
     doc.body.appendChild(messageBox);
 
     /* This function serves as the kickoff point for the game loop itself
@@ -69,6 +72,23 @@ var Engine = (function(global) {
         win.requestAnimationFrame(main);
     }
 
+    function renderLevelIndicator() {
+        levelBox.innerHTML = 'Level ' + (currentLevel + 1);
+    }
+
+    function nextLevel() {
+        currentLevel++;
+        if (currentLevel >= levels.length) {
+            setGameState('gameWon');
+        }
+        else {
+            allEnemies = levels[currentLevel].enemies;
+            player.reset();
+            renderLevelIndicator();
+            setGameState('playing');
+        }
+    }
+
     function setGameState(newState) {
         if (gameState != newState) {
             gameState = newState;
@@ -80,6 +100,9 @@ var Engine = (function(global) {
             }
             if (gameState == 'levelLost' || gameState == 'waiting') {
                 reset();
+            }
+            if (gameState == 'levelWon') {
+                nextLevel();
             }
         }
     }
@@ -102,11 +125,12 @@ var Engine = (function(global) {
                     player.handleInput(direction);
                 }
                 break;
-            case 'levelLost':
-                setGameState('waiting');
+            case 'gameWon':
+                reset();
+                setGameState('playing');
                 break;
-            case 'levelWon':
-                setGameState('waiting');
+            default:
+                setGameState('playing');
                 break;
         }
 
@@ -117,7 +141,7 @@ var Engine = (function(global) {
      */
     function init() {
         reset();
-        setGameState('waiting');
+        setGameState('playing');
         lastTime = Date.now();
         document.addEventListener('keyup', handleKeyUp);
         main();
@@ -229,7 +253,10 @@ var Engine = (function(global) {
      * those sorts of things. It's only called once by the init() method.
      */
     function reset() {
+        currentLevel = 0;
+        allEnemies = levels[currentLevel].enemies;
         player.reset();
+        renderLevelIndicator();
     }
 
     /* Go ahead and load all of the images we know we're going to need to

@@ -12,18 +12,16 @@ var convertRowToY = function (row) {
 };
 
 // Enemies our player must avoid
-var Enemy = function(row, speed) {
+var Enemy = function(startingColumn, row, speed) {
     // The image/sprite for our enemies, this uses
     // a helper we've provided to easily load images
     this.sprite = 'images/enemy-bug.png';
     this.width = spriteWidth;
-    this.x = 0;
+    this.x = convertColumnToX(startingColumn);
     this.y = convertRowToY(row);
     this.row = row;
-    this.speed = speed || Enemy.defaultSpeed;
+    this.speed = speed;
 };
-
-Enemy.defaultSpeed = 10;
 
 // Update the enemy's position, required method for game
 // Parameter: dt, a time delta between ticks
@@ -110,11 +108,13 @@ Player.prototype.reset = function () {
 // Now instantiate your objects.
 // Place all enemy objects in an array called allEnemies
 // Place the player object in a variable called player
-var allEnemies = [
-    new Enemy(1, 20),
-    new Enemy(2, 30),
-    new Enemy(3, 10)
+var levels = [
+    { enemies: [new Enemy(0, 1, 20), new Enemy(0, 2, 30), new Enemy(0, 3, 10)]},
+    { enemies: [new Enemy(0, 1, 20), new Enemy(0, 2, 30), new Enemy(0, 3, 10), new Enemy(3, 3, 10)]},
+    { enemies: [new Enemy(0, 1, 20), new Enemy(-1, 2, 30), new Enemy(2, 2, 30), new Enemy(0, 3, 10), new Enemy(3, 3, 10)]}
 ];
+
+var allEnemies = levels[0].enemies;
 
 var player = new Player();
 
