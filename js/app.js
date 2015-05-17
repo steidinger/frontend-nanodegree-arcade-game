@@ -134,7 +134,3 @@ document.addEventListener('keyup', function(e) {
         player.handleInput(direction);
     }
 });
-
-document.addEventListener("load", function () {
-    Engine.init();
-});
