@@ -22,12 +22,22 @@ var Engine = (function(global) {
     var doc = global.document,
         win = global.window,
         canvas = doc.createElement('canvas'),
+        messageBox = doc.createElement('p'),
         ctx = canvas.getContext('2d'),
+        gameState = 'waiting',
+        messages = {
+            waiting: 'Press any key to start a new game',
+            playing: 'Try to reach the top without being hit by a bug. You can move your character using the arrow keys',
+            levelWon: 'Congratulations, you\'ve reached the top! Press any key to continue',
+            levelLost: 'Too bad, you were hit by a bug. Press any key to continue'
+        },
         lastTime;
 
     canvas.width = 505;
     canvas.height = 606;
     doc.body.appendChild(canvas);
+    messageBox.setAttribute("class", "message");
+    doc.body.appendChild(messageBox);
 
     /* This function serves as the kickoff point for the game loop itself
      * and handles properly calling the update and render methods.
@@ -59,24 +69,73 @@ var Engine = (function(global) {
         win.requestAnimationFrame(main);
     }
 
+    function setGameState(newState) {
+        if (gameState != newState) {
+            gameState = newState;
+            if (messages[gameState]) {
+                messageBox.innerHTML = messages[gameState];
+            }
+            else {
+                messageBox.innerHTML = '';
+            }
+            if (gameState == 'levelLost' || gameState == 'waiting') {
+                reset();
+            }
+        }
+    }
+
+    function handleKeyUp(event) {
+        var movementKeys = {
+            37: 'left',
+            38: 'up',
+            39: 'right',
+            40: 'down'
+        };
+        var direction = movementKeys[event.keyCode];
+
+        switch (gameState) {
+            case 'waiting':
+                setGameState('playing');
+                break;
+            case 'playing':
+                if (direction) {
+                    player.handleInput(direction);
+                }
+                break;
+            case 'levelLost':
+                setGameState('waiting');
+                break;
+            case 'levelWon':
+                setGameState('waiting');
+                break;
+        }
+
+    }
     /* This function does some initial setup that should only occur once,
      * particularly setting the lastTime variable that is required for the
      * game loop.
      */
     function init() {
         reset();
+        setGameState('waiting');
         lastTime = Date.now();
+        document.addEventListener('keyup', handleKeyUp);
         main();
     }
 
     function checkCollisions() {
         allEnemies.forEach(function (enemy) {
             if (player.collidesWith(enemy)) {
-                reset();
+                setGameState('levelLost');
             }
         })
     }
 
+    function checkWinCondition() {
+        if (player.row == 0) {
+            setGameState('levelWon');
+        }
+    }
     /* This function is called by main (our game loop) and itself calls all
      * of the functions which may need to update entity's data. Based on how
      * you implement your collision detection (when two entities occupy the
@@ -89,6 +148,7 @@ var Engine = (function(global) {
     function update(dt) {
         updateEntities(dt);
         checkCollisions();
+        checkWinCondition();
     }
 
     /* This is called by the update function  and loops through all of the
