@@ -1,4 +1,13 @@
 // Enemies our player must avoid
+"use strict";
+var convertColumnToX = function (column) {
+    return column * 101;
+};
+
+var convertRowToY = function (row) {
+    return 60 + (row - 1) * 83;
+};
+
 var Enemy = function(row, speed) {
     // Variables applied to each of our instances go here,
     // we've provided one for you to get started
@@ -8,7 +17,7 @@ var Enemy = function(row, speed) {
     this.sprite = 'images/enemy-bug.png';
     this.width = 101;
     this.x = 0;
-    this.y = 60 + (row - 1) * 83;
+    this.y = convertRowToY(row);
     this.speed = speed || Enemy.defaultSpeed;
 };
 
@@ -31,21 +40,60 @@ Enemy.prototype.render = function() {
     ctx.drawImage(Resources.get(this.sprite), this.x, this.y);
 };
 
-// Now write your own player class
-// This class requires an update(), render() and
-// a handleInput() method.
+var Player = function () {
+    this.sprite = 'images/char-boy.png';
+    this.row = 5;
+    this.column = 2;
+    this.move = Player.MOVES.none;
+};
 
+Player.MOVES = {
+    left:  { dx: -1, dy:  0 },
+    up:    { dx:  0, dy: -1 },
+    right: { dx: +1, dy:  0 },
+    down:  { dx:  0, dy: +1 },
+    none:  { dx:  0, dy:  0 }
+};
 
-function nop() {}
+Player.prototype.update = function () {
+    this.column += this.move.dx;
+    if (this.column < 0) {
+        this.column = 0;
+    }
+    if (this.column > 4) {
+        this.column = 4;
+    }
+    this.row += this.move.dy;
+    if (this.row < 0) {
+        this.row = 0;
+    }
+    if (this.row > 5) {
+        this.row = 5;
+    }
+    this.move = Player.MOVES.none;
+};
+
+Player.prototype.render = function () {
+    var x = convertColumnToX(this.column);
+    var y = convertRowToY(this.row);
+
+    ctx.drawImage(Resources.get(this.sprite), x, y);
+};
+
+Player.prototype.handleInput = function (direction) {
+    this.move = Player.MOVES[direction] || Player.MOVES.NONE;
+};
+
 // Now instantiate your objects.
 // Place all enemy objects in an array called allEnemies
 // Place the player object in a variable called player
-var allEnemies = [new Enemy(1, 20), new Enemy(2, 30), new Enemy(3, 10)]; // todo
-var player = {
-    update: nop,
-    render: nop,
-    handleInput: nop
-}; // todo
+var allEnemies = [
+    new Enemy(1, 20),
+    new Enemy(2, 30),
+    new Enemy(3, 10)
+];
+
+var player = new Player();
 
 
 // This listens for key presses and sends the keys to your
@@ -57,8 +105,11 @@ document.addEventListener('keyup', function(e) {
         39: 'right',
         40: 'down'
     };
+    var direction = allowedKeys[e.keyCode];
 
-    player.handleInput(allowedKeys[e.keyCode]);
+    if (direction) {
+        player.handleInput(direction);
+    }
 });
 
 document.addEventListener("load", function () {
