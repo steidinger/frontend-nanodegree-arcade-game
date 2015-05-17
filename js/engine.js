@@ -126,7 +126,8 @@ var Engine = (function(global) {
             numRows = 6,
             numCols = 5,
             row, col;
-
+        ctx.fillStyle = '#FFFFFF';
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
         /* Loop through the number of rows and columns we've defined above
          * and, using the rowImages array, draw the correct image for that
          * portion of the "grid"
