@@ -1,23 +1,25 @@
-// Enemies our player must avoid
 "use strict";
+var spriteWidth = 101;
+var columnWidth = 101;
+var collisionTolerance = 15;
+
 var convertColumnToX = function (column) {
-    return column * 101;
+    return column * columnWidth;
 };
 
 var convertRowToY = function (row) {
     return 60 + (row - 1) * 83;
 };
 
+// Enemies our player must avoid
 var Enemy = function(row, speed) {
-    // Variables applied to each of our instances go here,
-    // we've provided one for you to get started
-
     // The image/sprite for our enemies, this uses
     // a helper we've provided to easily load images
     this.sprite = 'images/enemy-bug.png';
-    this.width = 101;
+    this.width = spriteWidth;
     this.x = 0;
     this.y = convertRowToY(row);
+    this.row = row;
     this.speed = speed || Enemy.defaultSpeed;
 };
 
@@ -42,6 +44,8 @@ Enemy.prototype.render = function() {
 
 var Player = function () {
     this.sprite = 'images/char-boy.png';
+    // unlike the bugs the player "jumps" from one position to the next,
+    // therefore I simply use row + column for his coordinates
     this.row = 5;
     this.column = 2;
     this.move = Player.MOVES.none;
@@ -73,6 +77,19 @@ Player.prototype.update = function () {
     this.move = Player.MOVES.none;
 };
 
+Player.prototype.collidesWith = function (that) {
+    var x = convertColumnToX(this.column);
+    if (this.row == that.row) {
+        if (x >= that.x && x <= that.x + spriteWidth - collisionTolerance) {
+            return true;
+        }
+        if (x + spriteWidth >= that.x + collisionTolerance && x + spriteWidth <= that.x + spriteWidth) {
+            return true;
+        }
+    }
+    return false;
+};
+
 Player.prototype.render = function () {
     var x = convertColumnToX(this.column);
     var y = convertRowToY(this.row);
@@ -82,6 +99,12 @@ Player.prototype.render = function () {
 
 Player.prototype.handleInput = function (direction) {
     this.move = Player.MOVES[direction] || Player.MOVES.NONE;
+};
+
+Player.prototype.reset = function () {
+    this.row = 5;
+    this.column = 2;
+    this.move = Player.MOVES.none;
 };
 
 // Now instantiate your objects.
