@@ -1,7 +1,7 @@
 "use strict";
 var spriteWidth = 101;
 var columnWidth = 101;
-var collisionTolerance = 15;
+var collisionTolerance = 25;
 
 var convertColumnToX = function (column) {
     return column * columnWidth;
