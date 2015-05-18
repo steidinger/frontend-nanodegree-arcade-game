@@ -117,5 +117,3 @@ var levels = [
 var allEnemies = levels[0].enemies;
 
 var player = new Player();
-
-

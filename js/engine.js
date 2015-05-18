@@ -135,6 +135,7 @@ var Engine = (function(global) {
         }
 
     }
+
     /* This function does some initial setup that should only occur once,
      * particularly setting the lastTime variable that is required for the
      * game loop.
@@ -160,6 +161,7 @@ var Engine = (function(global) {
             setGameState('levelWon');
         }
     }
+
     /* This function is called by main (our game loop) and itself calls all
      * of the functions which may need to update entity's data. Based on how
      * you implement your collision detection (when two entities occupy the
