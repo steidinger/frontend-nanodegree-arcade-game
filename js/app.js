@@ -77,7 +77,7 @@ Player.prototype.update = function () {
 
 Player.prototype.collidesWith = function (that) {
     var x = convertColumnToX(this.column);
-    if (this.row == that.row) {
+    if (this.row === that.row) {
         if (x >= that.x && x <= that.x + spriteWidth - collisionTolerance) {
             return true;
         }

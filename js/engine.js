@@ -98,10 +98,10 @@ var Engine = (function(global) {
             else {
                 messageBox.innerHTML = '';
             }
-            if (gameState == 'levelLost' || gameState == 'waiting') {
+            if (gameState === 'levelLost' || gameState === 'waiting') {
                 reset();
             }
-            if (gameState == 'levelWon') {
+            if (gameState === 'levelWon') {
                 nextLevel();
             }
         }
@@ -152,11 +152,11 @@ var Engine = (function(global) {
             if (player.collidesWith(enemy)) {
                 setGameState('levelLost');
             }
-        })
+        });
     }
 
     function checkWinCondition() {
-        if (player.row == 0) {
+        if (player.row === 0) {
             setGameState('levelWon');
         }
     }
